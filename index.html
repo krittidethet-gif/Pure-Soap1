@@ -8,7 +8,7 @@ header{text-align:center;padding:48px 16px;background:linear-gradient(135deg,#ec
 h1{margin:0 0 8px;font-size:2rem}main{max-width:900px;margin:auto;padding:24px 16px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
 .card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px #0001}
-.card img{width:100%;display:block}.card div{padding:14px}
+.card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}.card div{padding:14px}
 .price{font-weight:700;color:#7a56c2}
 input,textarea,button{font:inherit;padding:10px;border:1px solid #ccc;border-radius:8px;width:100%}
 .qty{width:80px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -34,8 +34,8 @@ button{background:#7a56c2;color:#fff;border:0;cursor:pointer;font-weight:700}
 <script>
 const API_URL = 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE';
 const PRODUCTS = [
-  {sku:'SOAP-LAV', name:'สบู่ลาเวนเดอร์', price:89, img:'images/lavender.svg', desc:'กลิ่นผ่อนคลาย'},
-  {sku:'SOAP-LEM', name:'สบู่เลมอน', price:79, img:'images/lemon.svg', desc:'สดชื่น กระปรี้กระเปร่า'}
+  {sku:'SOAP-LAV', name:'สบู่ลาเวนเดอร์', price:89, img:'images/lavender.jpg', desc:'กลิ่นผ่อนคลาย'},
+  {sku:'SOAP-LEM', name:'สบู่เลมอน', price:79, img:'images/lemon.jpg', desc:'สดชื่น กระปรี้กระเปร่า'}
 ];
 const $ = s => document.querySelector(s);
 $('#products').innerHTML = PRODUCTS.map(p => `<div class="card"><img src="${p.img}" alt="${p.name}"><div><h3>${p.name}</h3><p>${p.desc}</p><span class="price">${p.price} บาท</span></div></div>`).join('');
