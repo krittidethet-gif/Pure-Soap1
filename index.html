@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pure Soap | สบู่ธรรมชาติ</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,"Noto Sans Thai",sans-serif;color:#2b2b2b;background:#faf8f5}
+header{text-align:center;padding:48px 16px;background:linear-gradient(135deg,#ece6f7,#fff6d6)}
+h1{margin:0 0 8px;font-size:2rem}main{max-width:900px;margin:auto;padding:24px 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px #0001}
+.card img{width:100%;display:block}.card div{padding:14px}
+.price{font-weight:700;color:#7a56c2}
+input,textarea,button{font:inherit;padding:10px;border:1px solid #ccc;border-radius:8px;width:100%}
+.qty{width:80px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+form{background:#fff;padding:20px;border-radius:14px;box-shadow:0 2px 10px #0001;display:grid;gap:12px;margin-top:24px}
+button{background:#7a56c2;color:#fff;border:0;cursor:pointer;font-weight:700}
+#total{font-size:1.2rem;font-weight:700}#msg{font-weight:700}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>🧼 Pure Soap</h1><p>สบู่ก้อนทำมือ อ่อนโยนต่อผิว ส่งถึงบ้านคุณ</p></header>
+<main>
+<div class="grid" id="products"></div>
+<form id="f">
+  <h2>สั่งซื้อสินค้า</h2>
+  <div id="qtys"></div>
+  <div id="total">รวม 0 บาท</div>
+  <div class="row"><input name="name" placeholder="ชื่อ-นามสกุล" required><input name="phone" placeholder="เบอร์โทร" pattern="[0-9]{9,10}" required></div>
+  <textarea name="address" placeholder="ที่อยู่ (บ้านเลขที่ ซอย ถนน)" rows="2" required></textarea>
+  <div class="row"><input name="subdistrict" placeholder="แขวง/ตำบล" required><input name="district" placeholder="เขต/อำเภอ" required></div>
+  <div class="row"><input name="province" placeholder="จังหวัด" required><input name="postcode" placeholder="รหัสไปรษณีย์" pattern="[0-9]{5}" required></div>
+  <input name="note" placeholder="หมายเหตุ (ถ้ามี)">
+  <button id="btn">ยืนยันการสั่งซื้อ</button><div id="msg"></div>
+</form></main>
+<script>
+const API_URL = 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE';
+const PRODUCTS = [
+  {sku:'SOAP-LAV', name:'สบู่ลาเวนเดอร์', price:89, img:'images/lavender.svg', desc:'กลิ่นผ่อนคลาย'},
+  {sku:'SOAP-LEM', name:'สบู่เลมอน', price:79, img:'images/lemon.svg', desc:'สดชื่น กระปรี้กระเปร่า'}
+];
+const $ = s => document.querySelector(s);
+$('#products').innerHTML = PRODUCTS.map(p => `<div class="card"><img src="${p.img}" alt="${p.name}"><div><h3>${p.name}</h3><p>${p.desc}</p><span class="price">${p.price} บาท</span></div></div>`).join('');
+$('#qtys').innerHTML = PRODUCTS.map(p => `<label style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px">${p.name} (${p.price} บาท)<input class="qty" type="number" min="0" value="0" data-sku="${p.sku}"></label>`).join('');
+const calc = () => { const t = [...document.querySelectorAll('.qty')].reduce((s,i) => s + i.value * PRODUCTS.find(p => p.sku === i.dataset.sku).price, 0); $('#total').textContent = `รวม ${t} บาท`; return t; };
+document.querySelectorAll('.qty').forEach(i => i.oninput = calc);
+$('#f').onsubmit = async e => {
+  e.preventDefault();
+  if (!calc()) { $('#msg').textContent = 'กรุณาเลือกจำนวนสินค้า'; return; }
+  const d = Object.fromEntries(new FormData(e.target));
+  d.items = [...document.querySelectorAll('.qty')].map(i => ({sku:i.dataset.sku, qty:i.value}));
+  $('#btn').disabled = true; $('#msg').textContent = 'กำลังส่งคำสั่งซื้อ...';
+  try {
+    await fetch(API_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(d)});
+    $('#msg').textContent = '✅ ส่งคำสั่งซื้อเรียบร้อย ขอบคุณที่อุดหนุนค่ะ'; e.target.reset(); calc();
+  } catch (err) { $('#msg').textContent = '❌ ส่งไม่สำเร็จ ลองใหม่อีกครั้ง'; }
+  $('#btn').disabled = false;
+};
+</script></body></html>
