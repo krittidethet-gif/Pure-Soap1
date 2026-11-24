@@ -20,7 +20,7 @@ body.print-pick #labels-sec,body.print-label #pick-sec,body.print-label #tools,b
 <h2>รายการออเดอร์</h2><table id="list"></table></div>
 <div id="labels-sec"><h2 class="no-print-title">ใบจ่าหน้าพัสดุ</h2><div id="labels"></div></div>
 <script>
-const API_URL = 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwlyYn58jYcXp4sjyPK2B-jzQON14vt0ud15grzthSKFvQaeOGbZPW4oe79k-2-IfAU3Q/exec';
 const FROM = 'ผู้ส่ง: Pure Soap | โทร 08x-xxx-xxxx | ที่อยู่ร้านของคุณ';
 const KEY = localStorage.getItem('key') || prompt('รหัสผู้ดูแล:'); localStorage.setItem('key', KEY || '');
 const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
