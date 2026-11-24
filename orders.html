@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ออเดอร์ | หยิบ แพ็ค จ่าหน้า</title>
+<style>
+body{font-family:system-ui,"Noto Sans Thai",sans-serif;margin:0;padding:20px;background:#f4f4f4}
+h2{margin-top:28px}table{border-collapse:collapse;width:100%;background:#fff}
+th,td{border:1px solid #ccc;padding:8px;text-align:left}th{background:#eee}
+button{padding:10px 16px;margin-right:8px;border:0;border-radius:8px;background:#7a56c2;color:#fff;cursor:pointer;font:inherit}
+.label{background:#fff;border:2px dashed #333;padding:16px;margin:12px 0;break-inside:avoid;page-break-inside:avoid}
+.label h3{margin:0 0 6px}.from{font-size:.85rem;color:#555;border-bottom:1px solid #999;padding-bottom:6px;margin-bottom:8px}
+.to{font-size:1.15rem;line-height:1.5}.items{margin-top:8px;font-size:.9rem}
+body.print-pick #labels-sec,body.print-label #pick-sec,body.print-label #tools,body.print-pick #tools{display:none}
+@media print{#tools{display:none}body{background:#fff}.label{margin:0 0 10mm}}
+</style></head><body>
+<div id="tools"><button onclick="load()">🔄 โหลดข้อมูลใหม่</button>
+<button onclick="pr('print-pick')">🖨 พิมพ์ใบหยิบสินค้า</button>
+<button onclick="pr('print-label')">🖨 พิมพ์ใบจ่าหน้าพัสดุ</button></div>
+<div id="pick-sec"><h2>ใบหยิบสินค้า (รวมทุกออเดอร์)</h2><table id="pick"></table>
+<h2>รายการออเดอร์</h2><table id="list"></table></div>
+<div id="labels-sec"><h2 class="no-print-title">ใบจ่าหน้าพัสดุ</h2><div id="labels"></div></div>
+<script>
+const API_URL = 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE';
+const FROM = 'ผู้ส่ง: Pure Soap | โทร 08x-xxx-xxxx | ที่อยู่ร้านของคุณ';
+const KEY = localStorage.getItem('key') || prompt('รหัสผู้ดูแล:'); localStorage.setItem('key', KEY || '');
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function pr(c){document.body.className=c;window.print();document.body.className='';}
+async function load(){
+  const r = await (await fetch(`${API_URL}?action=orders&key=${encodeURIComponent(KEY)}`)).json();
+  if (r.error){ localStorage.removeItem('key'); alert('รหัสไม่ถูกต้อง'); return; }
+  const open = r.orders.filter(o => o.status === 'รอแพ็ค');
+  const sum = {};
+  open.forEach(o => { sum[o.sku] = sum[o.sku] || {name:o.product, qty:0}; sum[o.sku].qty += +o.qty; });
+  document.getElementById('pick').innerHTML = '<tr><th>SKU</th><th>สินค้า</th><th>จำนวนที่ต้องหยิบ</th></tr>' +
+    Object.entries(sum).map(([k,v]) => `<tr><td>${esc(k)}</td><td>${esc(v.name)}</td><td>${v.qty}</td></tr>`).join('');
+  const ids = [...new Set(open.map(o => o.order_id))];
+  document.getElementById('list').innerHTML = '<tr><th>เลขออเดอร์</th><th>ลูกค้า</th><th>สินค้า</th><th>ยอดรวม</th></tr>' +
+    ids.map(id => { const s = r.shipping.find(x => x.order_id === id) || {}, L = open.filter(o => o.order_id === id);
+      return `<tr><td>${id}</td><td>${esc(s.name)}</td><td>${L.map(l => `${esc(l.product)} ×${l.qty}`).join(', ')}</td><td>${L.reduce((a,l) => a + +l.line_total, 0)} บาท</td></tr>`; }).join('');
+  document.getElementById('labels').innerHTML = ids.map(id => { const s = r.shipping.find(x => x.order_id === id) || {}, L = open.filter(o => o.order_id === id);
+    return `<div class="label"><div class="from">${FROM}</div><h3>ถึง: ${esc(s.name)} (${esc(s.phone)})</h3>
+    <div class="to">${esc(s.address)} ${esc(s.subdistrict)} ${esc(s.district)}<br>${esc(s.province)} <b>${esc(s.postcode)}</b></div>
+    <div class="items">ออเดอร์ ${id}: ${L.map(l => `${esc(l.product)} ×${l.qty}`).join(', ')}${s.note ? '<br>หมายเหตุ: ' + esc(s.note) : ''}</div></div>`; }).join('');
+}
+load();
+</script></body></html>
