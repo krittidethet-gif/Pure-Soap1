@@ -5,8 +5,8 @@ function setup() { // รันครั้งเดียวเพื่อส�
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const defs = {
     Products: [['sku','name','price','stock','image'],
-      ['SOAP-LAV','สบู่ลาเวนเดอร์',89,100,'images/lavender.svg'],
-      ['SOAP-LEM','สบู่เลมอน',79,100,'images/lemon.svg']],
+      ['SOAP-LAV','สบู่ลาเวนเดอร์',89,100,'images/lavender.jpg'],
+      ['SOAP-LEM','สบู่เลมอน',79,100,'images/lemon.jpg']],
     Orders: [['order_id','timestamp','sku','product','qty','unit_price','line_total','status']],
     Shipping: [['order_id','timestamp','name','phone','address','subdistrict','district','province','postcode','note']]
   };
